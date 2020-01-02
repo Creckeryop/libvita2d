@@ -54,41 +54,22 @@ static vita2d_texture *_vita2d_load_JPEG_generic(struct jpeg_decompress_struct *
 	}
 
 	jpeg_finish_decompress(jinfo);
-
 	return texture;
 }
 
 
 vita2d_texture *vita2d_load_JPEG_file(const char *filename)
 {
-	FILE *fp;
-	if ((fp = fopen(filename, "rb")) <= 0) {
+	SceUID fd;
+	if ((fd = sceIoOpen(filename, SCE_O_RDONLY, 0777)) <= 0) {
 		return NULL;
 	}
-
-	unsigned int magic = 0;
-	fread(&magic, 1, sizeof(unsigned int), fp);
-	fseek(fp, 0, SEEK_SET);
-
-	if (magic != 0xE0FFD8FF && magic != 0xE1FFD8FF) {
-		fclose(fp);
-		return NULL;
-	}
-
-	struct jpeg_decompress_struct jinfo;
-	struct jpeg_error_mgr jerr;
-
-	jinfo.err = jpeg_std_error(&jerr);
-	jpeg_create_decompress(&jinfo);
-	jpeg_stdio_src(&jinfo, fp);
-	jpeg_read_header(&jinfo, 1);
-
-	vita2d_texture *texture = _vita2d_load_JPEG_generic(&jinfo, &jerr);
-
-	jpeg_destroy_decompress(&jinfo);
-
-	fclose(fp);
-	return texture;
+	uint32_t size = sceIoLseek(fd, 0, SEEK_END);
+	sceIoLseek(fd, 0, SEEK_SET);
+	unsigned int* buffer = (unsigned int*)malloc(sizeof(unsigned int)*size);
+	sceIoRead(fd, buffer, size);
+	sceIoClose(fd);
+	return vita2d_load_JPEG_buffer(buffer, size);
 }
 
 
