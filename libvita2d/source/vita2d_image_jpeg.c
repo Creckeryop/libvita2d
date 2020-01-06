@@ -69,7 +69,9 @@ vita2d_texture *vita2d_load_JPEG_file(const char *filename)
 	unsigned int* buffer = (unsigned int*)malloc(sizeof(unsigned int)*size);
 	sceIoRead(fd, buffer, size);
 	sceIoClose(fd);
-	return vita2d_load_JPEG_buffer(buffer, size);
+	vita2d_texture* texture = vita2d_load_JPEG_buffer(buffer, size);
+	free(buffer);
+	return texture;
 }
 
 
