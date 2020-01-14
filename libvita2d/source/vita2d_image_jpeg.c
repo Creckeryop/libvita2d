@@ -78,7 +78,7 @@ vita2d_texture *vita2d_load_JPEG_file(const char *filename)
 vita2d_texture *vita2d_load_JPEG_buffer(const void *buffer, unsigned long buffer_size)
 {
 	unsigned int magic = *(unsigned int *)buffer;
-	if (magic != 0xE0FFD8FF && magic != 0xE1FFD8FF) {
+	if (magic != 0xE0FFD8FF && magic != 0xE1FFD8FF && magic != 0xDBFFD8FF) {
 		return NULL;
 	}
 
